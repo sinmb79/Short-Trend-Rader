@@ -1,4 +1,4 @@
-# Short-Trend-Rader
+﻿# Short-Trend-Rader
 
 왜 이 저장소가 존재하나. 대부분의 트렌드 작업은 데이터를 못 모아서 실패하지 않습니다. 모은 뒤에 정리되지 않아서 실패합니다. 누군가는 링크를 모으고, 누군가는 따로 메모를 쓰고, 누군가는 나중에 다시 검색합니다. 그 사이에 타이밍이 사라집니다. `trend-radar`는 그 틈을 줄이기 위해 만들어졌습니다. 공개된 트렌드 신호를 한 번 모아서, 사람이 읽을 수 있는 Markdown과 다른 도구가 읽을 수 있는 JSON으로 같은 자리에 남깁니다.
 
@@ -160,35 +160,44 @@ This is the optional source.
 
 Some things are intentionally not included yet. TikTok, Instagram, X/Twitter, Whisper transcription, and long-running daemon mode are later steps. They were not excluded because they are impossible. They were deferred to keep the public default path stable at release time.
 
-## 설치와 첫 실행 / Installation And First Run
+## 설치 (3단계면 끝) / Install In 3 Steps
 
-가장 권장하는 경로는 Poetry를 사용하는 것입니다.
+처음부터 길게 설명하지 않겠습니다. 이 저장소는 이제 `setup.sh` 또는 `setup.bat` 하나로 Python 패키지 설치, n8n 설치, n8n 실행, 워크플로우 임포트까지 한 번에 처리할 수 있습니다.  
+English: I will not overcomplicate the first run. This repository now ships with `setup.sh` and `setup.bat` so one command can install the Python package, install n8n, start n8n, and import the bundled workflows.
 
-The recommended path is to use Poetry.
+### 사전 준비 / Prerequisites
+
+- Python 3.11+
+  English: Python 3.11 or newer
+- Node.js 20+
+  English: Node.js 20 or newer
+- npm
+  English: npm
+- Linux 또는 macOS에서는 `curl`
+  English: `curl` on Linux or macOS
+
+### 설치 + 실행 / Install + Run
 
 ```bash
-poetry install
-poetry run trend-radar doctor
-poetry run trend-radar init
-poetry run trend-radar run --once
-poetry run trend-radar digest today
+git clone https://github.com/sinmb79/Short-Trend-Rader.git
+cd Short-Trend-Rader
+
+# Linux / macOS
+chmod +x setup.sh
+./setup.sh
+
+# Windows
+setup.bat
 ```
 
-Poetry가 아직 없다면 Python만으로도 시작할 수 있습니다.
+브라우저에서 `http://localhost:5678`을 열면 끝입니다.  
+English: When the script finishes, open `http://localhost:5678`.
 
-If Poetry is not installed yet, you can still start with plain Python.
+목록에는 `trend-radar Collection Orchestrator`와 `trend-radar Daily Digest` 워크플로우가 바로 보입니다.  
+English: You should immediately see the `trend-radar Collection Orchestrator` and `trend-radar Daily Digest` workflows in the list.
 
-```bash
-python -m pip install --user --no-cache-dir -e .
-python -m trend_radar doctor
-python -m trend_radar init
-python -m trend_radar run --once
-python -m trend_radar digest today
-```
-
-이때 `doctor`를 먼저 돌리는 이유는 아주 단순합니다. 신입이 가장 많이 겪는 문제는 “코드가 고장 난 것 같지만 사실은 환경이 비어 있는 상황”입니다. `doctor`는 그 혼란을 줄이기 위해 만들었습니다.
-
-There is a simple reason to run `doctor` first. The most common beginner problem is thinking the code is broken when the environment is simply incomplete. `doctor` exists to reduce that confusion.
+조금 더 수동으로 하고 싶다면, 그때부터 `trend-radar doctor`, `trend-radar run --once`, `trend-radar digest today`를 하나씩 익히면 됩니다. 자동화보다 먼저 성공 경로를 이해하는 편이 결국 더 빠릅니다.  
+English: If you prefer a more manual path after that, start learning `trend-radar doctor`, `trend-radar run --once`, and `trend-radar digest today` one by one. Understanding the success path before the automation path is usually faster in the long run.
 
 ## 주요 명령 설명 / Command Guide
 
