@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trend-radar"
-version = "0.2.0"
+version = "0.2.1"
 description = "Universal trend intelligence daemon for 22B Labs."
 authors = ["22B Labs <sinmb82@gmail.com>"]
 maintainers = ["22B Labs · The 4th Path <sinmb82@gmail.com>"]

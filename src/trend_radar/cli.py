@@ -91,7 +91,7 @@ def config_show(ctx: click.Context, json_output: bool) -> None:
 @click.pass_context
 def run(ctx: click.Context, once: bool, source: str | None, output_dir: Path | None, json_output: bool) -> None:
     if not once:
-        raise click.UsageError("Only --once is implemented in v0.2.0.")
+        raise click.UsageError("Only --once is implemented in v0.2.1.")
     config: AppConfig = ctx.obj["config"]
     report = asyncio.run(run_once(config=config, output_dir=output_dir, source=source))
     if json_output:
