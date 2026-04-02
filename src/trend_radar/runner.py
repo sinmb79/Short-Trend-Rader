@@ -79,7 +79,7 @@ async def run_once(config: AppConfig, output_dir: str | Path | None = None, sour
     generated_at = now_iso()
     index_payload = {
         "generated_at": generated_at,
-        "version": "0.1.0",
+        "version": "0.2.0",
         "summary": {
             "total_items_collected": len(items),
             "platforms_active": sorted(by_platform),

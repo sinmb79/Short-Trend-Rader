@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "trend-radar"
-version = "0.1.0"
+version = "0.2.0"
 description = "Universal trend intelligence daemon for 22B Labs."
 authors = ["22B Labs <sinmb82@gmail.com>"]
 maintainers = ["22B Labs · The 4th Path <sinmb82@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/sinmb79/trend-radar"
-repository = "https://github.com/sinmb79/trend-radar"
-documentation = "https://github.com/sinmb79/trend-radar/tree/main/docs"
+homepage = "https://github.com/sinmb79/Short-Trend-Rader"
+repository = "https://github.com/sinmb79/Short-Trend-Rader"
+documentation = "https://github.com/sinmb79/Short-Trend-Rader/tree/main/docs"
 keywords = ["trends", "youtube", "reddit", "rss", "cli", "22b-labs"]
 classifiers = [
   "Development Status :: 3 - Alpha",

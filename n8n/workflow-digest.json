@@ -1,0 +1,136 @@
+{
+  "name": "trend-radar Daily Digest",
+  "nodes": [
+    {
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -620,
+        -80
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 22,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "prepare-command",
+      "name": "Prepare Digest Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "onError": "continueRegularOutput",
+      "position": [
+        -320,
+        20
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const item = $input.first()?.json ?? {};\nconst body = item.body ?? {};\nconst query = item.query ?? {};\nconst projectDir = body.project_dir ?? query.project_dir ?? 'D:\\\\workspace\\\\trend-radar';\nconst launcher = body.launcher ?? query.launcher ?? 'python -m trend_radar';\nconst outputDir = body.output_dir ?? query.output_dir ?? '';\nconst configPath = body.config_path ?? query.config_path ?? '';\nconst escapeForCmd = (value) => String(value).replace(/\"/g, '\"\"');\nlet command = `cd /d \"${escapeForCmd(projectDir)}\" && ${launcher}`;\nif (configPath) command += ` --config \"${escapeForCmd(configPath)}\"`;\ncommand += ' digest today';\nif (outputDir) command += ` --output-dir \"${escapeForCmd(outputDir)}\"`;\ncommand += ' --json';\nreturn [{\n  json: {\n    project_dir: projectDir,\n    launcher,\n    output_dir: outputDir || null,\n    config_path: configPath || null,\n    command,\n  },\n}];"
+      }
+    },
+    {
+      "id": "execute-command",
+      "name": "Build Digest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "onError": "continueRegularOutput",
+      "position": [
+        -20,
+        20
+      ],
+      "parameters": {
+        "command": "={{$json.command}}"
+      }
+    },
+    {
+      "id": "parse-digest",
+      "name": "Parse Digest Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "onError": "continueRegularOutput",
+      "position": [
+        280,
+        20
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const item = $input.first()?.json ?? {};\nconst stdout = item.stdout ?? '';\nconst stderr = item.stderr ?? '';\nconst exitCode = item.exitCode ?? 0;\nlet payload = {};\ntry {\n  payload = stdout ? JSON.parse(stdout) : {};\n} catch (error) {\n  payload = {\n    path: null,\n    content: stdout,\n    parse_error: error.message,\n  };\n}\nconst preview = payload.content ? payload.content.split('\\n').slice(0, 12).join('\\n') : '';\nreturn [{\n  json: {\n    ...payload,\n    preview,\n    exit_code: exitCode,\n    stderr,\n    raw_stdout: stdout,\n  },\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Digest Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Digest Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Digest Command": {
+      "main": [
+        [
+          {
+            "node": "Build Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Digest": {
+      "main": [
+        [
+          {
+            "node": "Parse Digest Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import sys
 from pathlib import Path
 
@@ -23,6 +24,10 @@ def safe_echo(text: str) -> None:
     except UnicodeEncodeError:
         encoding = sys.stdout.encoding or "utf-8"
         click.echo(text.encode(encoding, errors="replace").decode(encoding, errors="replace"))
+
+
+def emit_json(payload: object) -> None:
+    safe_echo(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
 @click.group()
@@ -67,22 +72,31 @@ def config() -> None:
 
 
 @config.command("show")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print machine-readable JSON.")
 @click.pass_context
-def config_show(ctx: click.Context) -> None:
+def config_show(ctx: click.Context, json_output: bool) -> None:
     config: AppConfig = ctx.obj["config"]
-    safe_echo(yaml.safe_dump(config.model_dump(mode="python"), allow_unicode=True, sort_keys=False).strip())
+    payload = config.model_dump(mode="python")
+    if json_output:
+        emit_json(payload)
+        return
+    safe_echo(yaml.safe_dump(payload, allow_unicode=True, sort_keys=False).strip())
 
 
 @cli.command()
 @click.option("--once", is_flag=True, default=False, help="Run collectors once.")
 @click.option("--source", default=None, help="Run only one collector.")
 @click.option("--output-dir", type=click.Path(path_type=Path), default=None, help="Override output directory.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print machine-readable JSON.")
 @click.pass_context
-def run(ctx: click.Context, once: bool, source: str | None, output_dir: Path | None) -> None:
+def run(ctx: click.Context, once: bool, source: str | None, output_dir: Path | None, json_output: bool) -> None:
     if not once:
-        raise click.UsageError("Only --once is implemented in v0.1.0.")
+        raise click.UsageError("Only --once is implemented in v0.2.0.")
     config: AppConfig = ctx.obj["config"]
     report = asyncio.run(run_once(config=config, output_dir=output_dir, source=source))
+    if json_output:
+        emit_json(report.to_dict())
+        return
     click.echo(f"Collected {report.total_items} items into {report.output_dir}")
     click.echo(f"Index: {report.index_path}")
     if report.digest_path:
@@ -93,10 +107,14 @@ def run(ctx: click.Context, once: bool, source: str | None, output_dir: Path | N
 
 @cli.command()
 @click.option("--output-dir", type=click.Path(path_type=Path), default=None, help="Override output directory.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print machine-readable JSON.")
 @click.pass_context
-def status(ctx: click.Context, output_dir: Path | None) -> None:
+def status(ctx: click.Context, output_dir: Path | None, json_output: bool) -> None:
     config: AppConfig = ctx.obj["config"]
     data = load_status(config=config, output_dir=output_dir)
+    if json_output:
+        emit_json(data)
+        return
     if not data["has_run"]:
         click.echo(f"No runs yet. Output dir: {data['output_dir']}")
         click.echo(f"Enabled collectors: {', '.join(data['active_collectors'])}")
@@ -109,11 +127,15 @@ def status(ctx: click.Context, output_dir: Path | None) -> None:
 
 @cli.command()
 @click.option("--output-dir", type=click.Path(path_type=Path), default=None, help="Override output directory.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print machine-readable JSON.")
 @click.pass_context
-def doctor(ctx: click.Context, output_dir: Path | None) -> None:
+def doctor(ctx: click.Context, output_dir: Path | None, json_output: bool) -> None:
     config: AppConfig = ctx.obj["config"]
     config_path: Path | None = ctx.obj.get("config_path")
     report = build_doctor_report(config=config, config_path=config_path, output_dir=output_dir)
+    if json_output:
+        emit_json(report)
+        return
     for row in report:
         safe_echo(f"[{row['status'].upper()}] {row['check']}: {row['detail']}")
 
@@ -125,8 +147,12 @@ def digest() -> None:
 
 @digest.command("today")
 @click.option("--output-dir", type=click.Path(path_type=Path), default=None, help="Override output directory.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print machine-readable JSON.")
 @click.pass_context
-def digest_today(ctx: click.Context, output_dir: Path | None) -> None:
+def digest_today(ctx: click.Context, output_dir: Path | None, json_output: bool) -> None:
     config: AppConfig = ctx.obj["config"]
     digest_path = generate_today_digest(config=config, output_dir=output_dir)
+    if json_output:
+        emit_json({"path": str(digest_path), "content": digest_path.read_text(encoding="utf-8")})
+        return
     safe_echo(digest_path.read_text(encoding="utf-8"))

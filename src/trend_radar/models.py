@@ -71,6 +71,20 @@ class CollectorResult:
         self.finished_at = now_iso()
         return self
 
+    def to_dict(self, include_items: bool = False) -> dict[str, Any]:
+        payload: dict[str, Any] = {
+            "name": self.name,
+            "item_count": len(self.items),
+            "warnings": self.warnings,
+            "errors": self.errors,
+            "skipped": self.skipped,
+            "started_at": self.started_at,
+            "finished_at": self.finished_at,
+        }
+        if include_items:
+            payload["items"] = [item.to_dict() for item in self.items]
+        return payload
+
 
 @dataclass(slots=True)
 class RunReport:
@@ -81,6 +95,21 @@ class RunReport:
     digest_path: str | None
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "status": "ok" if not self.errors else "warn",
+            "output_dir": self.output_dir,
+            "total_items": self.total_items,
+            "index_path": self.index_path,
+            "digest_path": self.digest_path,
+            "warnings": self.warnings,
+            "errors": self.errors,
+            "collectors": {
+                name: result.to_dict()
+                for name, result in sorted(self.collectors.items())
+            },
+        }
 
 
 def _unique_preserving_order(values: list[str]) -> list[str]:

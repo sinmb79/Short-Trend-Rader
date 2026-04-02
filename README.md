@@ -215,6 +215,30 @@ At the beginning, these commands are enough.
   한국어: Python 버전, config 존재 여부, 출력 경로, 선택 소스 환경변수를 점검합니다.
   English: Checks Python version, config presence, output path, and optional source credentials.
 
+## n8n 연동 / n8n Integration
+
+이 저장소는 CLI만 있는 프로젝트처럼 보이지만, 사실 그래서 더 n8n과 잘 맞습니다.  
+English: This repository may look like a CLI-first project, and that is exactly why it fits n8n well.
+
+핵심은 n8n이 코드를 대체하는 것이 아니라, 이미 잘 만든 CLI를 반복 가능하고 연결 가능한 워크플로우로 감싸는 데 있습니다.  
+English: The point is not to replace code with n8n, but to wrap a solid CLI in repeatable, connectable workflows.
+
+`n8n/` 디렉터리에는 바로 import할 수 있는 워크플로우와 자세한 연동 문서가 들어 있습니다.  
+English: The `n8n/` directory now includes import-ready workflows and a detailed integration guide.
+
+- `n8n/workflow.json`
+  한국어: 수동 실행, 웹훅 실행, 예약 실행을 한 워크플로우에 묶은 기본 수집 플로우입니다.
+  English: The main collection workflow covering manual, webhook, and scheduled runs.
+- `n8n/workflow-digest.json`
+  한국어: 일일 digest 생성에 집중한 보조 워크플로우입니다.
+  English: A companion workflow focused on daily digest generation.
+- `n8n/README.md`
+  한국어: 설치, import, 입력값, 경로 수정, 보안 주의사항까지 신입 온보딩처럼 설명한 가이드입니다.
+  English: A Korean-first bilingual guide that walks through setup, import, inputs, path edits, and security notes.
+
+자동화 친화성을 위해 `run`, `status`, `doctor`, `digest today`, `config show`는 이제 `--json` 출력도 지원합니다.  
+English: For automation, `run`, `status`, `doctor`, `digest today`, and `config show` now support `--json` output as well.
+
 ## 출력 파일은 어떻게 읽나 / How To Read The Output
 
 기본 출력 위치는 `~/.22b/trends`입니다.
