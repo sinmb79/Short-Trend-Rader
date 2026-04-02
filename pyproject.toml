@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "trend-radar"
+version = "0.1.0"
+description = "Universal trend intelligence daemon for 22B Labs."
+authors = ["22B Labs <sinmb82@gmail.com>"]
+maintainers = ["22B Labs · The 4th Path <sinmb82@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/sinmb79/trend-radar"
+repository = "https://github.com/sinmb79/trend-radar"
+documentation = "https://github.com/sinmb79/trend-radar/tree/main/docs"
+keywords = ["trends", "youtube", "reddit", "rss", "cli", "22b-labs"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+packages = [{ include = "trend_radar", from = "src" }]
+include = ["LICENSE", "config.example.yaml"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.8"
+pydantic = "^2.11.3"
+PyYAML = "^6.0.2"
+aiohttp = "^3.11.18"
+feedparser = "^6.0.11"
+pytrends = "^4.9.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-asyncio = "^0.26.0"
+
+[tool.poetry.scripts]
+trend-radar = "trend_radar.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
